@@ -42,11 +42,11 @@ echo "============================================"
 #echo -e " \033[38;2;255;0;0m CMake is required and not found!"
 #echo -e " \033[0;0;0;0;0m"
 #Get the number of CPUs
-cpucores=`getconf _NPROCESSORS_ONLN`
+cpucores=${"`getconf _NPROCESSORS_ONLN`"}
 #cpucores=1
 
 #VARIABLES
-MAKE=${MAKE:-make -j $(cpucores) -l $((cpucores + 1))}
+MAKE=${MAKE:-make -j $(cpucores) -l $(($(cpucores) + 1))}
 BASEDIR=$(pwd)
 TMPDIR=$BASEDIR/_$$
 #export STARPU_HOME=~/trash"
@@ -61,6 +61,10 @@ MPIVALUE="OFF"
 mkdir -p $TMPDIR
 
 SETUP_DIR=${R_PACKAGE_DIR:-''}
+
+echo $BASEDIR;
+echo $TMPDIR;
+echo $SETUP_DIR;
 
 print_usage() {
 	echo "usage: $0 [--enable-mpi|--disable-mpi] [--prefix /path/to/install]"
@@ -111,6 +115,7 @@ done
 
 
 if [ -z "$SETUP_DIR" ]; then
+  echo "Here"
 	# Use RLIBS for setup dir
 	arr=(`Rscript -e '.libPaths()' | awk '{Rprintf "%s ",$2}'`)
 	for i in ${!arr[*]};
@@ -123,6 +128,8 @@ if [ -z "$SETUP_DIR" ]; then
 		fi
 	done
 fi
+echo "There";
+echo $SETUP_DIR;
 mkdir -p $SETUP_DIR
 
 if [ -z "$SETUP_DIR" ]
@@ -131,6 +138,10 @@ then
 	exit 1;
 fi
 PREFIX=$SETUP_DIR
+
+echo $PREFIX;
+cmake -DCMAKE_BUILD_TYPE="Release" -DCMAKE_C_FLAGS_RELEASE="-O3 -Ofast -w" -DBUILD_SHARED_LIBS=ON .
+exit 1;
 
 ############################## Check OS
 echo "Finding the current os type"
@@ -392,8 +403,8 @@ else
 	then
 		echo "Building StarPU..."
 		cd $TMPDIR
-		wget https://files.inria.fr/starpu/starpu-1.2.9/starpu-1.2.9.tar.gz -O - | tar -zx
-		cd starpu-1.2.9
+		wget https://files.inria.fr/starpu/starpu-1.3.9/starpu-1.3.9.tar.gz -O - | tar -zx
+		cd starpu-1.3.9
 		#CFLAGS=-Wno-implicit-function-declaration
 		if [ "$CUDAVALUE" == "ON" ]; then
 			if [ "$MPIVALUE" == "ON" ]; then
@@ -551,6 +562,7 @@ echo "======================================"
 #Dummy makefile in src to trigger real one from cmake.
 cd $BASEDIR/
 rm -rf ./CMakeFiles ./CMakeCache.txt
+#export LD_LIBRARY_PATH=/opt/intel/oneapi/mkl/2022.0.2/lib/intel64:$LD_LIBRARY_PATH
 cmake -DCMAKE_BUILD_TYPE="Release" -DCMAKE_C_FLAGS_RELEASE="-O3 -Ofast -w" -DBUILD_SHARED_LIBS=ON -DEXAGEOSTAT_EXAMPLES=OFF "$XFLAG" "$DEFINE_BLAS_LIBS_CMAKE" -DEXAGEOSTAT_USE_MPI=$MPIVALUE -DEXAGEOSTAT_USE_HICMA=ON ./src
 echo "============EXAGEOSTAT======================"
 echo "$(ls $PREFIX/lib)"

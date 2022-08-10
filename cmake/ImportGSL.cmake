@@ -1,0 +1,17 @@
+message("")
+message("---------------------------------------- GSL")
+message(STATUS "Checking for GSL")
+if(NOT TARGET GSL)
+    find_package(GSL QUIET)
+    if(GSL_FOUND)
+        message(" Found GSL")
+    else()
+        message("Here")
+        execute_process(COMMAND "./InstallGSL.sh"
+                        WORKING_DIRECTORY ${CMAKE_MODULE_PATH}/scripts
+                        RESULT_VARIABLE res)
+        message(${res})
+        message("After")
+    endif()
+endif()
+message(STATUS "GSL Done")

@@ -1,0 +1,17 @@
+message("")
+message("---------------------------------------- NLOPT")
+message(STATUS "Checking for NLOPT")
+if(NOT TARGET NLOPT)
+    find_package(NLOPT QUIET)
+    if(NLOPT_FOUND)
+        message(" Found NLOPT")
+    else()
+        message("Here")
+        execute_process(COMMAND "./InstallNLOPT.sh"
+                WORKING_DIRECTORY ${CMAKE_MODULE_PATH}/scripts
+                RESULT_VARIABLE res)
+        message(${res})
+        message("After")
+    endif()
+endif()
+message(STATUS "NLOPT Done")
