@@ -7,6 +7,7 @@ echo "$MAKE"
 SETUP_DIR=$(pwd)
 PREFIX="/tmp/Cmake-test"
 MPIVALUE=OFF
+CUDAVALUE=OFF
 echo "$PKG_CONFIG_PATH"
 
 print_usage() {
@@ -47,12 +48,20 @@ done
 echo "Building Chameleon..."
 git clone https://github.com/ecrc/hicma h
 cd h || exit 1;
+echo "Before Update"
 git submodule update --init --recursive
+echo "After Update"
 cd chameleon
+echo "After CD"
 git checkout 8595b23
+echo "New Update"
 git submodule update --init --recursive
-mkdir -p build && (cd build || exit 1)
+echo "Before Mkdir"
+mkdir -p build
+cd build || exit 1
+echo "Here"
+echo $(pwd)
 rm -rf ./CMake*
-LDFLAGS="-L$PREFIX/lib" cmake -DCMAKE_C_FLAGS=-fPIC -DCHAMELEON_USE_MPI=$MPIVALUE -DCMAKE_BUILD_TYPE="Release" -DCMAKE_C_FLAGS_RELEASE="-O3 -Ofast -w" -DCHAMELEON_USE_CUDA=$CUDAVALUE -DCHAMELEON_ENABLE_EXAMPLE=OFF -DCHAMELEON_ENABLE_TESTING=OFF -DCHAMELEON_ENABLE_TIMING=OFF -DBUILD_SHARED_LIBS=OFF -DCMAKE_INSTALL_PREFIX=$PREFIX "$BLAS" ..
+LDFLAGS="-L$PREFIX/lib" cmake -DCMAKE_C_FLAGS=-fPIC -DCHAMELEON_USE_MPI=$MPIVALUE -DCMAKE_BUILD_TYPE="Release" -DCMAKE_C_FLAGS_RELEASE="-O3 -Ofast -w" -DCHAMELEON_USE_CUDA=$CUDAVALUE -DCHAMELEON_ENABLE_EXAMPLE=OFF -DCHAMELEON_ENABLE_TESTING=OFF -DCHAMELEON_ENABLE_TIMING=OFF -DBUILD_SHARED_LIBS=OFF -DCMAKE_INSTALL_PREFIX=$PREFIX ..
 $MAKE || $MAKE VERBOSE=1 || { echo 'CHAMELEON installation failed' ; exit 1; }
 $MAKE install
