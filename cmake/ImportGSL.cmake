@@ -5,13 +5,13 @@ if(NOT TARGET GSL)
     find_package(GSL QUIET)
     if(GSL_FOUND)
         message(" Found GSL")
-    else()
-        message("Here")
-        execute_process(COMMAND "./InstallGSL.sh"
+    elseif(${BUILD_DEPENDENCIES})
+        execute_process(COMMAND ./InstallGSL.sh --prefix ${CMAKE_INSTALL_PREFIX} --setup ${TMP_DIR}
                         WORKING_DIRECTORY ${CMAKE_MODULE_PATH}/scripts
                         RESULT_VARIABLE res)
-        message(${res})
-        message("After")
+        if(${res} EQUAL 0)
+            set(GSL_FOUND TRUE)
+        endif()
     endif()
 endif()
 message(STATUS "GSL Done")

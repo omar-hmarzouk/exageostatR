@@ -5,13 +5,13 @@ if(NOT TARGET NLOPT)
     find_package(NLOPT QUIET)
     if(NLOPT_FOUND)
         message(" Found NLOPT")
-    else()
-        message("Here")
-        execute_process(COMMAND "./InstallNLOPT.sh"
-                WORKING_DIRECTORY ${CMAKE_MODULE_PATH}/scripts
-                RESULT_VARIABLE res)
-        message(${res})
-        message("After")
+    elseif(${BUILD_DEPENDENCIES})
+        execute_process(COMMAND ./InstallNLOPT.sh --prefix ${CMAKE_INSTALL_PREFIX} --setup ${TMP_DIR}
+                        WORKING_DIRECTORY ${CMAKE_MODULE_PATH}/scripts
+                        RESULT_VARIABLE res)
+        if(${res} EQUAL 0)
+            set(NLOPT_FOUND TRUE)
+        endif()
     endif()
 endif()
 message(STATUS "NLOPT Done")

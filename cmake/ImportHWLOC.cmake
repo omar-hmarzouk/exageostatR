@@ -4,14 +4,14 @@ message(STATUS "Checking for HWLOC")
 if(NOT TARGET HWLOC)
     find_package(HWLOC QUIET)
     if(HWLOC_FOUND)
-        message(" Found HWLOC")
-    else()
-        message("Here")
-        execute_process(COMMAND "./InstallHWLOC.sh"
-                WORKING_DIRECTORY ${CMAKE_MODULE_PATH}/scripts
-                RESULT_VARIABLE res)
-        message(${res})
-        message("After")
+        message("Found HWLOC")
+    elseif(${BUILD_DEPENDENCIES})
+        execute_process(COMMAND ./InstallHWLOC.sh --prefix ${CMAKE_INSTALL_PREFIX} --setup ${TMP_DIR}
+                        WORKING_DIRECTORY ${CMAKE_MODULE_PATH}/scripts
+                        RESULT_VARIABLE res)
+        if(${res} EQUAL 0)
+            set(HWLOC_FOUND TRUE)
+        endif()
     endif()
 endif()
 message(STATUS "HWLOC Done")
